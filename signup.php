@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		// Start user session
 		session_start();
 		// Set up username to current username
-		$_SESSION['username'] = $username
+		$_SESSION['username'] = $username;
 
 		$alert = "You have sucessfully signed up and logged in " . $username . "!";
 		echo "<script type='text/javascript'>alert('$alert');</script>";
