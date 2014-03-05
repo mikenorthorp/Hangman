@@ -4,6 +4,7 @@ Require('config.php');
 
 // Start user session
 session_start();
+
 /* -------------------------- */
 /* START VARIABLE SETUP       */
 /* -------------------------- */
@@ -106,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1) {
 		} else {
 			// Check if guessed letter is in word
 			$correct = 1;
-			
+
 
 
 			// If not in word increase fails
@@ -116,12 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1) {
 			}	
 		}
 	}
-
-
-
-	echo $alpha;
-	// Check if letter is contained in word, if not increase tries, and do checks
-
 }
 
 // Debug
