@@ -39,11 +39,14 @@ if($username == "admin") {
 	$isAdmin = 1;
 }
 
-$numLettersGuessed = 0;
+$numFailedGuess = 0;
 // Check the number of letters guessed
-if($_SESSION['numLettersGuessed'] != 0) {
-	$numLettersGuessed = $_SESSION['numLettersGuessed'];
+if($_SESSION['numFailedGuess'] != 0) {
+	$numFailedGuess = $_SESSION['numFailedGuess'];
 }
+
+// This gets written too if there are any errors and displayed on the page.
+$gameError = "";
 
 /* -------------------------- */
 /*   END VARIABLE SETUP 	  */
@@ -51,8 +54,6 @@ if($_SESSION['numLettersGuessed'] != 0) {
 
 /* Connect to database to display highscore table and other database stuff */
 $link = mysqli_connect($db_host, $db_user, $db_pass, $db_name) or die ('Your DB connection has failed or is misconfigured, please enter correct values in the config file and try again');
-
-echo $_SESSION['username'] . " is logged in ";
 
 // If a post request is submitted from the game to start it
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -63,15 +64,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		// Grab random word on start and store in session
 		// If availible in database
+		$query = "SELECT * FROM words";
+		$result = mysqli_query($link, $query);
+		$numRows = mysqli_num_rows($result);
+
+		// Check if any words are returned
+		if ($numRows == 0) {
+			$gameError = "No words availible, please login as Admin and upload some words.";
+			// Alerts the user that no words are availbile via an alert popup
+			echo "<script type='text/javascript'>alert('$gameError');</script>";
+
+			// Turn the game off
+			$_SESSION['inProgress'] = 0;
+			$gameInProgress = $_SESSION['inProgress'];
+		} else {
+			// Grab a word random word from database and set it
+
+
+			// Grab a random word from a random row returned
+			$word = "Test";
+
+			// Set the session variable for the word
+			$_SESSION['word'] = $word;
+		}
 	}
 }
 
-// Check if a letter is guessed 
-if ($_SERVER["REQUEST_METHOD"] == "GET") {
+// Check if a letter is guessed only if game is in progress (stop people from running GET after game over)
+if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1) {
 	$alpha = "";
 	if(isset($_GET['guess'])) {
 		$alpha = $_GET['guess'];
+
+		// Increase the number of letters if less than 5 and incorrect, end game if fails are 5
+		if($numFailedGuess == 5) {
+			// Set as a loss for user
+
+			// Reset session except for the user
+
+			// Display a message telling the user they lost
+		} else {
+			// Check if guessed letter is in word
+			$correct = 1;
+			
+
+
+			// If not in word increase fails
+			if ($correct == 1) {
+				$numFailedGuess++;
+				$_SESSION['numFailedGuess'] = $numFailedGuess;	
+			}	
+		}
 	}
+
+
 
 	echo $alpha;
 	// Check if letter is contained in word, if not increase tries, and do checks
@@ -90,28 +136,31 @@ var_dump($_SESSION);
 </head>
 <body>
 <div id="content">
+	<h1> INFX 2670 Assignment 3 - Michael Northorp </h1>
 	<!-- This displays the word randomly chosen if the game is started -->
-	<?php if($inProgress == 1) : ?>
+	<?php if($gameInProgress == 1) : ?>
 	<div id="word_display">
+		<p> The word to guess is <?php echo $word; ?> </p>
 	</div>
 	<?php endif; ?>
 
 	<!-- Shows signup/login or logout depending on user state -->
 	<?php if($username === "Anon") : ?>
 	<div id="login_signup">
+		<p> You are not logged in </p>
 		<a href="signup.php">Signup</a>
 		<a href="login.php">Login</a>
 	</div>
 	<?php else : ?>
 	<div id="logout">
+		<p> You are logged in as <?php echo $username; ?> </p>
 		<a href="logout.php">Logout</a>
 	</div>
 	<?php endif; ?>
 
 	<!-- The display area for the hangman game -->
 	<div id="hangman_game">
-		<h1> INFX 2670 Assignment 3 - Michael Northorp </h1>
-
+		<h2> Hangman Game </h2>
 		<!-- This triggers the start of the game, and is hidden if the game is started -->
 		<?php if($gameInProgress != 1) : ?>
 			<div id="game_trigger">
@@ -123,6 +172,9 @@ var_dump($_SESSION);
 		<?php endif; ?>
 		<!-- Generate a list of links for alphabet guessing for hangman if game is on -->
 		<?php if($gameInProgress == 1) : ?>
+		<div id="hangman_image">
+			<img src="images/hang<?php echo $numFailedGuess ?>.gif">
+		</div>
 		<div id="alpha_list">
 			<p> Select a letter below to fill in the word above </p>
 			<?php 
