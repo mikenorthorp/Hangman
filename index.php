@@ -1,10 +1,19 @@
 <?php
 // Require database config options
-require_once('config.php');
+Require('config.php');
 
 /* -------------------------- */
 /* START VARIABLE DECLERATION */
 /* -------------------------- */
+
+// Set up define values
+
+// Amount of tries allowed
+define('NUM_TRIES', 5);
+
+$isAdmin = 0;
+$gameInProgress = 0;
+$numLettersGuessed = 0;
 
 
 /* -------------------------- */
@@ -28,6 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 <div id="content">
+	<div id="word_display">
+	</div>
+	<div id="login_signup">
+		<a href="signup.php">Signup</a>
+		<a href="login.php">Login</a>
+	</div>
 	<div id="hangman_game">
 		<h1> INFX 2670 Assignment 3 - Michael Northorp </h1>
 	</div>
