@@ -1,6 +1,6 @@
 <?php
-// Includes
-
+// Require database config options
+require_once('config.php');
 
 /* -------------------------- */
 /* START VARIABLE DECLERATION */
@@ -12,7 +12,7 @@
 /* -------------------------- */
 
 /* Connect to database to display highscore table and other database stuff */
-
+$link = mysqli_connect($db_host, $db_user, $db_pass, $db_name) or die ('Your DB connection has failed or is misconfigured, please enter correct values in the config file and try again');
 
 // If a post request is submitted to start the game or go to register / login page
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
