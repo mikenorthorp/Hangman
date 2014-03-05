@@ -63,6 +63,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// If authenticated, move back to main page and set session variables
 	if ($authenticated == 1) {
+		// Set up session data
+
+		// Start user session
+		session_start();
+		$_SESSION['username'] = $username;
+
+		// Alert user they have been logged in
 		$alert = "You have been logged in " . $username . "!";
 		echo "<script type='text/javascript'>alert('$alert');</script>";
 
