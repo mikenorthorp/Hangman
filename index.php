@@ -118,7 +118,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// Reset the game if the user chooses too
 	if(isset($_POST['reset'])) {
 		$isReset = 1;
-		$isLoss = 1;
 	}
 
 	// If a word list is uploaded
@@ -212,21 +211,15 @@ if($isReset == 1) {
 	$_SESSION['gameOver'] = 0;
 
 	// Check if resetting after a win, so dont count as loss
-	if(isset($_SESSION['isWin'])) {
-		// No win detected so reset is because of loss or just a reset press
-		if($_SESSION['isWin'] != 1) {
-			$isLoss = 1;
-		}
+	if(isset($_SESSION['isWin']) && $_SESSION['isWin'] == 1) {
 		// Reset win condition detected so don't count as loss and reset win to 0
 		$_SESSION['isWin'] = 0;
-	} else {
-		// There is a loss an no win has happened yet
-		$isLoss = 1;
-	}
-
-	// Reset loss condition as well if set
-	if(isset($_SESSION['isLoss'])) {
+	} else if(isset($_SESSION['isLoss']) && $_SESSION['isLoss'] == 1) {
+		// Reset is loss to 0
 		$_SESSION['isLoss'] = 0;
+	} else {
+		// Count as loss 
+		$isLoss = 1;
 	}
 
 }
