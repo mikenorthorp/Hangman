@@ -23,6 +23,10 @@ if (!isset($_SESSION['username'])) {
 	$_SESSION['username'] = "Anon";
 }
 
+// Create a list for the high scores
+$highScoreListWins = Array();
+$highScoreListLosses = Array();
+
 // Checks if there is a loss or win
 $isLoss = 0;
 $isWin = 0;
@@ -154,6 +158,13 @@ if(isset($_SESSION['gameOver'])) {
 		$gameOver = 1;
 	}
 }
+
+// Reset the user scores if clicked by admin
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['reset']) && $isAdmin == 1){
+	$query = "UPDATE users SET wins=0, losses=0";
+	mysqli_query($link, $query);
+}
+
 // Check if a letter is guessed only if game is in progress (stop people from running GET after game over)
 if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1 && $gameOver == 0) {
 	$alpha = "";
@@ -280,6 +291,17 @@ if($isWin == 1) {
 	$isWin = 0;
 }
 
+// Grab the top 10 scores if applicable and through them into an associative array
+$query = "SELECT username, wins, losses FROM users ORDER BY wins DESC LIMIT 10";
+$result = mysqli_query($link, $query);
+
+// Go through all results returned, store them in arrays
+while($row = mysqli_fetch_assoc($result)) {
+	// Store wins and losses
+	$highScoreListWins[$row['username']] = $row['wins'];
+	$highScoreListLosses[$row['username']] = $row['losses'];
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -315,6 +337,27 @@ if($isWin == 1) {
 	<!-- The display area for the hangman game -->
 	<div id="hangman_game">
 		<h2> Hangman Game </h2>
+		<!-- Show the Scoreboard here always-->
+		<table border="1">
+			<tr>
+				<th>Name</th>
+				<th>Wins</th>
+				<th>Losses</th>
+			</tr>
+			<!-- Loop through top 10 scores (if possible) -->
+			<?php
+				foreach ($highScoreListWins as $username => $wins) {
+					$losses = $highScoreListLosses[$username];
+					echo"<tr><td>" . $username . "</td><td>" . $wins . "</td><td>" . $losses . "</td></tr>";
+				}
+			?>
+		</table>
+		<!-- Allow admin to reset scores -->
+		<?php if($isAdmin == 1) : ?>
+			<?php echo '<br><a href="index.php?reset=1">Reset Scores</a>'; ?>
+		<? endif; ?>
+		<!-- End the scoreboard display -->
+
 		<!-- This triggers the start of the game, and is hidden if the game is started -->
 		<?php if($gameInProgress != 1) : ?>
 			<div id="game_trigger">
@@ -375,7 +418,7 @@ if($isWin == 1) {
 	</div>
 
 	<!-- Allow admin to upload a list of words that replaces current word list -->
-	<?php if($username === "admin") : ?>
+	<?php if($isAdmin == 1) : ?>
 	<div id="word_upload">
 		<form method="post" enctype="multipart/form-data">
 			<div id="upload">
