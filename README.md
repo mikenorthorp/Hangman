@@ -22,7 +22,8 @@ Installation
 
 1. Copy files into working directory.
 2. Make sure apache and mySQL is running
-4. Import the .sql file export of the database to your own mySQL installation.
+3. Import the .sql file export of the database to your own mySQL installation. ex. `mysql -u root -p -h localhost hangman < db_backup.sql`
+4. Change the information in config.php to match your database information
 5. Users are entered with wins/losses already, as well as some sample words.
 6. Go to the page you set it up on.
 
