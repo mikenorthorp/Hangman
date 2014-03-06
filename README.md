@@ -12,20 +12,28 @@ It is a hangman game that allows the user to play a simple game of hangman. The 
 Requirements
 ------------
 
-This program requires `php` and `apache` to be installed on the server you are running this on.
+This program requires `php` and `apache` and `mySQL` to be installed on the server you are running this on. As well as 
+support for mysqli in php (must have that extension enabled and working).
 
-This program is made to run on the bluenose.cs.dal.ca servers but should work any apache based server with PHP installed.
+This program is made to run on the bluenose.cs.dal.ca servers but should work any apache based server with PHP and MySQL installed.
 
 Installation
 ------------
 
 1. Copy files into working directory.
-2. Make sure apache is running
+2. Make sure apache and mySQL is running
+4. Import the .sql file export of the database to your own mySQL installation.
 3. Go to the page you set it up on.
 
 Making the Website Do Things
 ----------------------------
-
+1. You can play the game without logging in, it is a basic hangman game. The word is displayed in the top left though.
+2. Click login or signup to make an account or log into an existing account.
+3. Login with admin/admin to use the admin account, which allows you to add a word list, or reset scores.
+4. When not logged in your score will be saved to the Anon account, else it will save to your user.
+5. You can view the highscore table whenever you want, which shows the top 10.
+6. You will lose once you incorrectly guess 5 times.
+7. Have fun!
 
 Citations
 =========
