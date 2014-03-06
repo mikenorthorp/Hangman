@@ -23,6 +23,13 @@ if (!isset($_SESSION['username'])) {
 	$_SESSION['username'] = "Anon";
 }
 
+// Checks if there is a loss or win
+$isLoss = 0;
+$isWin = 0;
+
+// Checks if there is a reset of the game
+$isReset = 0;
+
 // Set username to whatever is stored in the session
 $username = $_SESSION['username'];
 
@@ -93,6 +100,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$_SESSION['word'] = $word;
 		}
 	}
+
+	// Reset the game if the user chooses too
+	if($_POST['reset'] == "reset") {
+		$isReset = 1;
+	}
 }
 
 // Check if a letter is guessed only if game is in progress (stop people from running GET after game over)
@@ -101,30 +113,85 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1) {
 	if(isset($_GET['guess'])) {
 		$alpha = $_GET['guess'];
 
-		// Increase the number of letters if less than 5 and incorrect, end game if fails are 5
-		if($numFailedGuess == 5) {
-			// Set as a loss for user
+		// Check if guessed letter is in word
+		$correct = 1;
 
-			// Reset session except for the user
-
-			// Display a message telling the user they lost
-		} else {
-			// Check if guessed letter is in word
-			$correct = 1;
-
-
-
-			// If not in word increase fails
-			if ($correct == 1) {
-				$numFailedGuess++;
-				$_SESSION['numFailedGuess'] = $numFailedGuess;	
-			}	
+		// If letter is not in word, count as incorrect guess.
+		if (strpos($word, $alpha) === false) {
+			$correct = 0;
 		}
+
+		// If not in word increase fails
+		if ($correct != 1) {
+			$numFailedGuess++;
+			$_SESSION['numFailedGuess'] = $numFailedGuess;	
+		}	
+
+		// Check if they failed their last guess 
+		if($numFailedGuess == 5) {
+			echo "Test";
+			// Set as a loss for user
+			$isLoss = 1;
+			// Reset session except for the user
+			$isReset = 1;
+			// Display a message telling the user they lost
+			$message = "You have lost!";
+			echo "<script type='text/javascript'>alert('$message');</script>";
+		} 
 	}
 }
 
-// Debug
-var_dump($_SESSION);
+// Check if user reset the game
+if($isReset == 1) {
+	// Reset guesses to 0
+	$_SESSION['numFailedGuess'] = 0;
+	$numFailedGuess = 0;
+	// Turn game off
+	$_SESSION['inProgress'] = 0;
+	$gameInProgress = 0;
+
+	// Set as a loss
+	$isLoss = 1;
+}
+
+// If a loss is detected add to losses
+if($isLoss == 1) {
+	// Get current users losses
+	$query = "SELECT * FROM users WHERE username='" . mysqli_real_escape_string($link, $username) . "'";
+	$result = mysqli_query($link, $query);
+	$row = mysqli_fetch_assoc($result);
+
+	// Increase losses of user
+	$currentLosses = $row['losses'];
+	$currentLosses++;
+
+	// Add to losses of current user
+	$query = "UPDATE users SET losses=" . $currentLosses . " WHERE username='" . mysqli_real_escape_string($link, $username) . "'";
+	mysqli_query($link, $query);
+
+	// Set isLoss to 0
+	$isLoss = 0;
+}
+
+// If a win is detected add to wins
+if($isWin == 1) {
+	// Get current users wins
+	$query = "SELECT * FROM users WHERE username='" . mysqli_real_escape_string($link, $username) . "'";
+	$result = mysqli_query($link, $query);
+	$row = mysqli_fetch_assoc($result);
+
+	// Increase wins of user
+	$currentWins = $row['wins'];
+	$currentWins++;
+
+	// Add to wins of current user
+	$query = "UPDATE users SET wins=" . $currentWins . " WHERE username='" . mysqli_real_escape_string($link, $username) . "'";
+	mysqli_query($link, $query);
+
+	// Set isWin to 0
+	$isWin = 0;
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -174,6 +241,11 @@ var_dump($_SESSION);
 		<div id="hangman_image">
 			<img src="images/hang<?php echo $numFailedGuess ?>.gif">
 		</div>
+
+		<!-- This displays the guessed word when correct letters are guessed, as well as blank spaces at the start -->
+		<div id="guessed_word">
+
+		</div>
 		<div id="alpha_list">
 			<p> Select a letter below to fill in the word above </p>
 			<?php 
@@ -184,9 +256,23 @@ var_dump($_SESSION);
 			    	printf('<a href="index.php?guess=%1$s" class="alpha">%1$s</a> ', chr($i));
 				}
 			?>
-			</div>
+		</div>
+		<div id="reset">
+			<form method="post">
+				<p> Resetting the game will count as a loss! </p>
+				<input type="hidden" name="reset" value="reset"/>
+				<input type="submit" value="Reset Game" id="btn">
+			</form>
+		</div>
 		<?php endif; ?>
 	</div>
+
+	<!-- Allow admin to upload a list of words -->
+	<?php if($username === "admin") : ?>
+	<div id="word_upload">
+
+	</div>
+	<?php endif; ?>
 </div>
 
 </body>
