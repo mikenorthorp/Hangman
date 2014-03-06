@@ -70,7 +70,7 @@ $link = mysqli_connect($db_host, $db_user, $db_pass, $db_name) or die ('Your DB 
 // If a post request is submitted from the game to start it
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// Set game to start if user hit play hangman
-	if($_POST['start'] == "start") {
+	if(isset($_POST['start'])) {
 		$_SESSION['inProgress'] = 1;
 		$gameInProgress = $_SESSION['inProgress'];
 
@@ -102,8 +102,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 
 	// Reset the game if the user chooses too
-	if($_POST['reset'] == "reset") {
+	if(isset($_POST['reset'])) {
 		$isReset = 1;
+	}
+
+	// If a word list is uploaded
+	if (isset($_POST['submit_files'])) {
+		$tmpName = $_FILES['upload_file']['tmp_name'];
+		$handle = fopen($tmpName, "r");
+		if ($handle) {
+			// Remove all current words from word list
+	    	$query = "DELETE FROM words";
+			mysqli_query($link, $query);
+
+		    while (($line = fgets($handle)) !== false) {
+		        // Upload each word to the database
+		        $line = preg_replace('/\s+/', '', $line);
+				$query = "INSERT INTO words (word) VALUES ('" . mysqli_real_escape_string($link, $line) . "')";
+				mysqli_query($link, $query);
+		    }
+		}
 	}
 }
 
@@ -267,10 +285,16 @@ if($isWin == 1) {
 		<?php endif; ?>
 	</div>
 
-	<!-- Allow admin to upload a list of words -->
+	<!-- Allow admin to upload a list of words that replaces current word list -->
 	<?php if($username === "admin") : ?>
 	<div id="word_upload">
-
+		<form method="post" enctype="multipart/form-data">
+			<div id="upload">
+				<p><label for="upload_file">Upload a Word List</label></p>
+				<input type="file" id="upload_file" name="upload_file"><br>
+			</div>
+			<input type="submit" name="submit_files" value="Upload Word List" id="btn">
+		</form>
 	</div>
 	<?php endif; ?>
 </div>
