@@ -33,6 +33,12 @@ $isReset = 0;
 // Set username to whatever is stored in the session
 $username = $_SESSION['username'];
 
+// String for all incorrect guesses
+$incorrectGuesses = "";
+if(isset($_SESSION['incorrectGuesses'])) {
+	$incorrectGuesses = $_SESSION['incorrectGuesses'];
+}
+
 // Set the word to whatever is stored in the session if it is set
 if(isset($_SESSION['word'])) {
 	$word = $_SESSION['word'];
@@ -61,9 +67,6 @@ if(isset($_SESSION['numFailedGuess'])) {
 
 // This gets written too if there are any errors and displayed on the page.
 $gameError = "";
-
-// This gets written if there is a win or loss message for the user
-$gameMessage = "";
 
 /* -------------------------- */
 /*   END VARIABLE SETUP 	  */
@@ -175,14 +178,23 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1 && $gameOver == 
 		// If not in word increase fails
 		if ($correct != 1) {
 			$numFailedGuess++;
-			$_SESSION['numFailedGuess'] = $numFailedGuess;	
+			$_SESSION['numFailedGuess'] = $numFailedGuess;
+
+			// Add to string of incorrect guesses
+			if(!isset($_SESSION['incorrectGuesses'])) {
+				$_SESSION['incorrectGuesses'] = "";
+			}
+
+			$_SESSION['incorrectGuesses'] .= $alpha . ", ";
+			$incorrectGuesses = $_SESSION['incorrectGuesses'];
+
 		} else {
 			// Check for win condition if guess is correct by checking for _ in hidden word
 			if (strpos(implode("", $_SESSION['hiddenWord']), '_') === false) {
 				$isWin = 1;
 				$_SESSION['isWin'] = 1;
 				$_SESSION['gameOver'] = 1;
-				$gameMessage = "You have won! Hit reset to play again and see if you are on the highscore board!";
+				$_SESSION['gameMessage'] = "You have won! Hit reset to play again and see if you are on the highscore board!";
 			}
 		}
 
@@ -193,7 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && $gameInProgress == 1 && $gameOver == 
 			$_SESSION['isLoss'] = 1;
 			$_SESSION['gameOver'] = 1;
 			// Display a message telling the user they lost
-			$gameMessage = "You have lost! Hit reset to play again!";
+			$_SESSION['gameMessage'] = "You have lost! Hit reset to play again!";
 		} 
 	}
 }
@@ -209,6 +221,12 @@ if($isReset == 1) {
 
 	// Set game over to not over
 	$_SESSION['gameOver'] = 0;
+
+	// Reset incorrect guesses
+	$_SESSION['incorrectGuesses'] = "";
+
+	// Erase game message
+	$_SESSION['gameMessage'] = "";
 
 	// Check if resetting after a win, so dont count as loss
 	if(isset($_SESSION['isWin']) && $_SESSION['isWin'] == 1) {
@@ -311,7 +329,7 @@ if($isWin == 1) {
 		<?php if($gameInProgress == 1) : ?>
 		<div id="hangman_image">
 			<img src="images/hang<?php echo $numFailedGuess; ?>.gif">
-			<br><span class="game_message"><?php echo $gameMessage; ?></span>
+			<br><span class="game_message"><?php if(isset($_SESSION['gameMessage'])) echo $_SESSION['gameMessage']; ?></span>
 		</div>
 
 		<!-- This displays the guessed word when correct letters are guessed, as well as blank spaces at the start -->
@@ -326,6 +344,8 @@ if($isWin == 1) {
 			}
 			echo "</p>";
 		?>
+		<br>
+		<p> Incorrect Guesses - <?php echo $incorrectGuesses; ?> </p>
 		</div>
 		<div id="alpha_list">
 			<p> Select a letter below to fill in the word above </p>
@@ -340,7 +360,13 @@ if($isWin == 1) {
 		</div>
 		<div id="reset">
 			<form method="post">
-				<p> Resetting the game will count as a loss! </p>
+				<?php if(isset($_SESSION['isWin']) && $_SESSION['isWin'] == 1) : ?>
+				<p class="win"> Click Reset Game to Play Again :) </p>
+				<?php elseif(isset($_SESSION['isLoss']) && $_SESSION['isLoss'] == 1) : ?>
+				<p class="loss"> Click Reset Game to Play Again :( </p>
+				<?php else : ?>
+				<p class="reset"> Click Reset Game to Play Again - Will Count As Loss </p>
+				<?php endif; ?>
 				<input type="hidden" name="reset" value="reset"/>
 				<input type="submit" value="Reset Game" id="btn">
 			</form>
