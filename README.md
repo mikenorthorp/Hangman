@@ -23,7 +23,9 @@ Installation
 1. Copy files into working directory.
 2. Make sure apache and mySQL is running
 4. Import the .sql file export of the database to your own mySQL installation.
-3. Go to the page you set it up on.
+5. Users are entered with wins/losses already, as well as some sample words.
+6. Go to the page you set it up on.
+
 
 Making the Website Do Things
 ----------------------------
