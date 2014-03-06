@@ -51,9 +51,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$authenticated = 0;
 		} else {
 			// Add a new entry into the user field with the new user and 0 wins
-			$query = "INSERT INTO users (username, password, isAdmin, wins) VALUES (";
+			$query = "INSERT INTO users (username, password, isAdmin, wins, losses) VALUES (";
 			$query .= "'" . mysqli_real_escape_string($link, $username) . "',";
 			$query .= "'" . mysqli_real_escape_string($link, $passwordHash) . "',";
+			$query .= "0,";
 			$query .= "0,";
 			$query .= "0";
 			$query .= ")";
