@@ -7,7 +7,7 @@ $db_host = 'localhost';
 // Username for database
 $db_user = 'root';
 // Password for database					
-$db_pass = '';		
+$db_pass = '1234';		
 // Name of database connecting too			
 $db_name = 'hangman';   
 
