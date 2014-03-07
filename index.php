@@ -132,12 +132,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$tmpName = $_FILES['upload_file']['tmp_name'];
 		$handle = fopen($tmpName, "r");
 		if ($handle) {
-			// Remove all current words from word list
-	    	$query = "DELETE FROM words";
+			// Remove all by dropping the entire ID column
+	    	$query = "ALTER TABLE words DROP id";
 			mysqli_query($link, $query);
 
-			// Reset auto increment
-			$query = "ALTER TABLE words AUTO_INCREMENT = 1";
+			// Reset auto increment by recreating the ID column
+			$query = 'ALTER TABLE words ADD COLUMN id INT(1) PRIMARY KEY';
+			mysqli_query($link, $query);
+			// Set the auto increment property
+			$query = 'ALTER TABLE words AUTO_INCREMENT = 1';
 			mysqli_query($link, $query);
 			
 		    while (($line = fgets($handle)) !== false) {
