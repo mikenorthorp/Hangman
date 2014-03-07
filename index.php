@@ -313,13 +313,6 @@ while($row = mysqli_fetch_assoc($result)) {
 <body>
 <div id="content">
 	<h1> INFX 2670 Assignment 3 - Michael Northorp </h1>
-	<!-- This displays the word randomly chosen if the game is started -->
-	<?php if($gameInProgress === 1) : ?>
-	<div id="word_display">
-		<p> The word to guess is <?php echo $word; ?> </p>
-	</div>
-	<?php endif; ?>
-
 	<!-- Shows signup/login or logout depending on user state -->
 	<?php if($username === "Anon") : ?>
 	<div id="login_signup">
@@ -331,13 +324,22 @@ while($row = mysqli_fetch_assoc($result)) {
 	<div id="logout">
 		<p> You are logged in as <?php echo $username; ?> </p>
 		<a href="logout.php">Logout</a>
+		<!-- Allow admin to upload a list of words that replaces current word list -->
+		<?php if($isAdmin == 1) : ?>
+		<div id="word_upload">
+			<form method="post" enctype="multipart/form-data">
+				<div id="upload">
+					<p><label for="upload_file">Upload a Word List</label></p>
+					<input type="file" id="upload_file" name="upload_file"><br>
+				</div>
+				<input type="submit" name="submit_files" value="Upload Word List" id="btn">
+			</form>
+		</div>
+		<?php endif; ?>
 	</div>
 	<?php endif; ?>
-
-	<!-- The display area for the hangman game -->
-	<div id="hangman_game">
-		<h2> Hangman Game </h2>
-		<!-- Show the Scoreboard here always-->
+	<!-- Show the Scoreboard here always-->
+	<div id="scoreboard">
 		<table border="1">
 			<tr>
 				<th>Name</th>
@@ -356,7 +358,19 @@ while($row = mysqli_fetch_assoc($result)) {
 		<?php if($isAdmin == 1) : ?>
 			<?php echo '<br><a href="index.php?reset=1">Reset Scores</a>'; ?>
 		<? endif; ?>
-		<!-- End the scoreboard display -->
+	</div>
+	<!-- End the scoreboard display -->	
+
+	<!-- The display area for the hangman game -->
+	<div id="hangman_game">
+		<!-- This displays the word randomly chosen if the game is started -->
+		<?php if($gameInProgress === 1) : ?>
+		<div id="word_display">
+			<p> The word to guess is <?php echo $word; ?> </p>
+		</div>
+		<?php endif; ?>
+
+		<h2 id="hangman_title"> Hangman Game </h2>
 
 		<!-- This triggers the start of the game, and is hidden if the game is started -->
 		<?php if($gameInProgress != 1) : ?>
@@ -381,13 +395,12 @@ while($row = mysqli_fetch_assoc($result)) {
 			// Display the hidden word with same length as word to guess
 			// But has underscores if letter is not guessed
 			$hiddenWord = $_SESSION['hiddenWord'];
-			echo "<p>";
+			echo '<p id="fillin">';
 			for($i = 0; $i < $_SESSION['wordLength']; $i++) {
 				echo "$hiddenWord[$i] ";
 			}
 			echo "</p>";
 		?>
-		<br>
 		<p> Incorrect Guesses - <?php echo $incorrectGuesses; ?> </p>
 		</div>
 		<div id="alpha_list">
@@ -397,7 +410,7 @@ while($row = mysqli_fetch_assoc($result)) {
 				// Modified from http://stackoverflow.com/questions/19213681/creating-links-for-all-letters-of-the-alphabet
 				for ($i = 65; $i <= 90; $i++) {
 					// This displays the number as the char in alphabet A-Z
-			    	printf('<a href="index.php?guess=%1$s" class="alpha">%1$s</a> ', chr($i));
+			    	printf('<a href="index.php?guess=%1$s" class="alpha">%1$s</a>  ', chr($i));
 				}
 			?>
 		</div>
@@ -416,19 +429,6 @@ while($row = mysqli_fetch_assoc($result)) {
 		</div>
 		<?php endif; ?>
 	</div>
-
-	<!-- Allow admin to upload a list of words that replaces current word list -->
-	<?php if($isAdmin == 1) : ?>
-	<div id="word_upload">
-		<form method="post" enctype="multipart/form-data">
-			<div id="upload">
-				<p><label for="upload_file">Upload a Word List</label></p>
-				<input type="file" id="upload_file" name="upload_file"><br>
-			</div>
-			<input type="submit" name="submit_files" value="Upload Word List" id="btn">
-		</form>
-	</div>
-	<?php endif; ?>
 </div>
 
 </body>

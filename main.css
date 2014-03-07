@@ -46,21 +46,6 @@ input[type=submit]:hover {
 	border-color: #adadad;
 }
 
-/* Some form styles taken from bootstrap */
-form {
-	margin-left: 0;
-	margin-right: 0;
-	background-color: #fff;
-	border-width: 1px;
-	border-color: #ddd;
-	border-radius: 4px 4px 0 0;
-	box-shadow: none;
-	position: relative;
-	padding: 45px 15px 15px;
-	margin: 0 -15px 15px;
-	border-style: solid;
-}
-
 .btn {
   display: block;
   background: red;
@@ -77,20 +62,11 @@ form {
 	color: red;
 }
 
-.errorOutline {
-	border: 1px solid red;
-}
-
 /* Content positioning */
 #content {
-	width:800px;
+	width: 800px;
+	height: 600px;
 	margin:0 auto;
-}
-
-/* Results styles, same as form style */
-#results {
-	margin-left: 0;
-	margin-right: 0;
 	background-color: #fff;
 	border-width: 1px;
 	border-color: #ddd;
@@ -98,21 +74,56 @@ form {
 	box-shadow: none;
 	position: relative;
 	padding: 45px 15px 15px;
-	margin: 0 -15px 15px;
 	border-style: solid;
 }
 
-/* Archive styles, same as form style */
-#archive {
-	margin-left: 0;
-	margin-right: 0;
-	background-color: #fff;
-	border-width: 1px;
-	border-color: #ddd;
-	border-radius: 4px 4px 0 0;
-	box-shadow: none;
-	position: relative;
-	padding: 45px 15px 15px;
-	margin: 0 -15px 15px;
-	border-style: solid;
+#word_display {
+	font-weight: bold;
+	color: red;
+}
+
+#login_signup {
+	float: right;
+}
+
+#logout {
+	float: right;
+}
+
+#scoreboard {
+	float: right;
+	margin-left: 20px;
+ 	margin-right: 20px;
+}
+
+#reset {
+	margin-top: 20px;
+	margin-left: 20px;
+}
+
+#word_upload {
+	margin-top: 275px;
+}
+
+#fillin {
+	font-size: 24px;
+}
+
+.alpha {
+	font-size: 24px;
+}
+
+.win {
+	color: green;
+	font-weight: bold;
+}
+
+.reset {
+	color: orange;
+	font-weight: bold;
+}
+
+.game_message, .loss{
+	color: red;
+	font-weight: bold;
 }
