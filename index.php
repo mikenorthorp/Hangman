@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(-1);
 
 // Require database config options
 Require('config.php');
@@ -133,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		// Get an array of the words in a file
 		$fileName = $_FILES['upload_file']['tmp_name'];
 		$fileArray = file($fileName, FILE_SKIP_EMPTY_LINES);
-		
+
 		// Remove all by dropping the entire ID column
 		$query = "DELETE FROM words";
 		mysqli_query($link, $query);
