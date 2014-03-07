@@ -129,28 +129,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// If a word list is uploaded
 	if (isset($_POST['submit_files'])) {
-		$tmpName = $_FILES['upload_file']['tmp_name'];
-		$handle = fopen($tmpName, "r");
-		if ($handle) {
-			// Remove all by dropping the entire ID column
-	    	$query = "ALTER TABLE words DROP id";
-			mysqli_query($link, $query);
 
-			// Reset auto increment by recreating the ID column
-			$query = 'ALTER TABLE words ADD COLUMN id INT(1) PRIMARY KEY';
+		// Get an array of the words in a file
+		$fileName = $_FILES['upload_file']['tmp_name'];
+		$fileArray = file($fileName, FILE_SKIP_EMPTY_LINES);
+		
+		// Remove all by dropping the entire ID column
+		$query = "DELETE FROM words";
+		mysqli_query($link, $query);
+
+		// Drop the id table
+    	$query = "ALTER TABLE words DROP id";
+		mysqli_query($link, $query);
+
+		// Reset auto increment by recreating the ID column
+		$query = 'ALTER TABLE words ADD COLUMN id INT(1) PRIMARY KEY AUTO_INCREMENT';
+		mysqli_query($link, $query);
+		
+	    foreach ($fileArray as $line) {
+	        // Upload each word to the database
+	        $line = preg_replace('/\s+/', '', $line);
+	        $line = strtoupper($line);
+	        $line = mysqli_real_escape_string($link, $line);
+			$query = "INSERT INTO words (word) VALUES ('" . $line . "')";
+			// Insert word into database
 			mysqli_query($link, $query);
-			// Set the auto increment property
-			$query = 'ALTER TABLE words AUTO_INCREMENT = 1';
-			mysqli_query($link, $query);
-			
-		    while (($line = fgets($handle)) !== false) {
-		        // Upload each word to the database
-		        $line = preg_replace('/\s+/', '', $line);
-		        $line = strtoupper($line);
-				$query = "INSERT INTO words (word) VALUES ('" . mysqli_real_escape_string($link, $line) . "')";
-				mysqli_query($link, $query);
-		    }
-		}
+	    }
 	}
 }
 
